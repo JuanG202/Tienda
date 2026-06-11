@@ -1,0 +1,18 @@
+/* ── NuevoCliente: form card ── */
+.card-form {
+  background: var(--blanco);
+  border-radius: var(--radio-lg);
+  padding: 24px;
+  box-shadow: var(--sombra);
+  margin-bottom: 16px;
+}
+
+.card-form h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+  color: var(--texto);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

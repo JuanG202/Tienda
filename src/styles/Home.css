@@ -1,0 +1,132 @@
+/* ── Home: tarjeta resumen ── */
+.card-resumen {
+  background: linear-gradient(135deg, var(--verde) 0%, #1a4a35 100%);
+  border-radius: 22px;
+  padding: 26px 24px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(45,106,79,0.3);
+}
+
+.card-resumen::before {
+  content: '';
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+}
+
+.card-resumen::after {
+  content: '';
+  position: absolute;
+  right: 30px;
+  bottom: -50px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+
+.card-resumen .label {
+  font-size: 0.75rem;
+  opacity: 0.72;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.card-resumen .monto {
+  font-family: 'Fraunces', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.card-resumen .sub {
+  font-size: 0.84rem;
+  opacity: 0.7;
+  margin-top: 10px;
+}
+
+/* ── Home: lista clientes ── */
+.clientes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cliente-card {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--sombra);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.1s;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+.cliente-card:hover {
+  box-shadow: var(--sombra-hover);
+  transform: translateY(-1px);
+}
+.cliente-card:active { transform: scale(0.99); }
+
+.cliente-avatar {
+  width: 44px;
+  height: 44px;
+  background: var(--crema-oscuro);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cafe);
+  flex-shrink: 0;
+  font-family: 'Fraunces', serif;
+}
+
+.cliente-info { flex: 1; min-width: 0; }
+
+.cliente-nombre {
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: var(--texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cliente-fecha {
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+  margin-top: 2px;
+}
+
+.cliente-saldo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--cafe);
+  flex-shrink: 0;
+}
+
+.cliente-saldo.pagado { color: var(--verde-claro); }
+
+.flecha {
+  color: var(--texto-suave);
+  opacity: 0.35;
+  flex-shrink: 0;
+}

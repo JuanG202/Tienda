@@ -1,0 +1,207 @@
+/* ── NuevaVenta: cliente seleccionado badge ── */
+.cliente-seleccionado-badge {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--sombra);
+  margin-bottom: 24px;
+  border-left: 4px solid var(--verde);
+}
+
+.badge-check { color: var(--verde); flex-shrink: 0; }
+
+/* ── Productos para venta ── */
+.productos-venta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.producto-venta-card {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--sombra);
+  transition: box-shadow 0.15s;
+}
+.producto-venta-card:hover { box-shadow: var(--sombra-hover); }
+
+.producto-venta-info { flex: 1; min-width: 0; }
+
+.producto-venta-nombre {
+  font-weight: 600;
+  font-size: 0.97rem;
+  color: var(--texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.producto-venta-precio {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+  margin-top: 2px;
+}
+
+/* ── Contador ── */
+.contador {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  background: var(--crema);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.contador-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cafe);
+  transition: background 0.12s, color 0.12s;
+  line-height: 1;
+}
+.contador-btn:hover:not(:disabled) { background: var(--cafe); color: white; }
+.contador-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+.contador-num {
+  width: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--texto);
+}
+
+/* ── Resumen venta ── */
+.resumen-venta {
+  background: var(--blanco);
+  border-radius: var(--radio-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--sombra);
+}
+
+.resumen-venta .titulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--texto-suave);
+  margin-bottom: 12px;
+}
+
+.resumen-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid var(--crema-oscuro);
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.resumen-total {
+  font-family: 'Fraunces', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--cafe);
+  text-align: right;
+}
+
+/* ── Tabs tipo pago ── */
+.tipo-venta-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.tipo-tab {
+  padding: 13px;
+  border-radius: var(--radio);
+  border: 2px solid var(--crema-oscuro);
+  background: var(--blanco);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--texto-suave);
+}
+.tipo-tab:hover { border-color: var(--cafe); color: var(--cafe); }
+.tipo-tab.activo.fiado {
+  background: var(--cafe-bg);
+  border-color: var(--cafe);
+  color: var(--cafe);
+}
+.tipo-tab.activo.contado {
+  background: var(--verde-bg);
+  border-color: var(--verde);
+  color: var(--verde);
+}
+
+/* ── Sin productos ── */
+.sin-productos {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
+
+/* ── Pantalla éxito ── */
+.exito-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  text-align: center;
+  gap: 0;
+}
+
+.exito-icon { font-size: 4rem; margin-bottom: 20px; }
+
+.exito-titulo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.6rem;
+  color: var(--verde);
+  margin-bottom: 8px;
+}
+
+.exito-cliente {
+  color: var(--texto-suave);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.exito-monto {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  color: var(--cafe);
+  margin-bottom: 36px;
+  font-weight: 700;
+}
+
+.exito-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  max-width: 280px;
+}
