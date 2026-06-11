@@ -69,8 +69,8 @@ function Home() {
       <div className="header">
         <div className="header-icon">🏪</div>
         <div>
-          <h1>Mi Tienda</h1>
-          <p>Control de fiados</p>
+          <h1>Mi Tienda - Doña Vivi</h1>
+          <p>Control</p>
         </div>
       </div>
 

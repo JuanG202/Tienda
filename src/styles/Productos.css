@@ -96,3 +96,30 @@
 }
 .emoji-btn:hover { transform: scale(1.15); }
 .emoji-btn.selected { background: var(--cafe); }
+
+/* ── Acciones producto ── */
+.producto-acciones {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.btn-editar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.btn-editar:hover {
+  background: var(--verde-bg);
+  color: var(--verde);
+}
