@@ -32,46 +32,42 @@ function ClienteDetalle() {
   const [cliente, setCliente] = useState(null);
   const [productos, setProductos] = useState([]);
   const [modal, setModal] = useState(null);
+  const [modalEnviar, setModalEnviar] = useState(false);
 
   const [productoSel, setProductoSel] = useState(null);
   const [concepto, setConcepto] = useState("");
   const [valorFiado, setValorFiado] = useState("");
   const [valorPago, setValorPago] = useState("");
 
- useEffect(() => {
-  const cargarDatos = async () => {
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const resCliente = await axios.get(
+          `https://tienda-back-ten.vercel.app/api/clientes/${id}`
+        );
+        const resProductos = await axios.get(
+          "https://tienda-back-ten.vercel.app/api/productos"
+        );
+        setCliente(resCliente.data);
+        setProductos(resProductos.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    cargarDatos();
+  }, [id]);
+
+  const actualizarCliente = async (nuevoCliente) => {
     try {
-      const resCliente = await axios.get(
-        `https://tienda-back-ten.vercel.app/api/clientes/${id}`
+      const res = await axios.put(
+        `https://tienda-back-ten.vercel.app/api/clientes/${cliente._id}`,
+        nuevoCliente
       );
-
-      const resProductos = await axios.get(
-        "https://tienda-back-ten.vercel.app/api/productos"
-      );
-
-      setCliente(resCliente.data);
-      setProductos(resProductos.data);
-
+      setCliente(res.data);
     } catch (error) {
       console.error(error);
     }
   };
-
-  cargarDatos();
-}, [id]);
-
-  const actualizarCliente = async (nuevoCliente) => {
-  try {
-    const res = await axios.put(
-      `https://tienda-back-ten.vercel.app/api/clientes/${cliente._id}`,
-      nuevoCliente
-    );
-
-    setCliente(res.data);
-  } catch (error) {
-    console.error(error);
-  }
-};
 
   const seleccionarProducto = (p) => {
     if (productoSel && productoSel._id === p._id) {
@@ -84,69 +80,86 @@ function ClienteDetalle() {
   };
 
   const registrarFiado = async () => {
-  const conceptoFinal =
-    concepto.trim() || (productoSel ? productoSel.nombre : "");
+    const conceptoFinal = concepto.trim() || (productoSel ? productoSel.nombre : "");
+    const monto = toNum(valorFiado);
+    if (!monto || !conceptoFinal) return;
 
-  const monto = toNum(valorFiado);
+    const nuevoCliente = {
+      ...cliente,
+      saldo: cliente.saldo + monto,
+      historial: [
+        ...cliente.historial,
+        {
+          tipo: "fiado",
+          concepto: conceptoFinal,
+          valor: monto,
+          fecha: new Date().toLocaleDateString("es-CO", {
+            day: "2-digit", month: "short", year: "numeric",
+          }),
+        },
+      ],
+    };
 
-  if (!monto || !conceptoFinal) return;
-
-  const nuevoCliente = {
-    ...cliente,
-    saldo: cliente.saldo + monto,
-    historial: [
-      ...cliente.historial,
-      {
-        tipo: "fiado",
-        concepto: conceptoFinal,
-        valor: monto,
-        fecha: new Date().toLocaleDateString("es-CO", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-      },
-    ],
+    await actualizarCliente(nuevoCliente);
+    setConcepto(""); setValorFiado(""); setProductoSel(null); setModal(null);
   };
-
-  await actualizarCliente(nuevoCliente);
-
-  setConcepto("");
-  setValorFiado("");
-  setProductoSel(null);
-  setModal(null);
-};
 
   const registrarPago = async () => {
-  const monto = toNum(valorPago);
+    const monto = toNum(valorPago);
+    if (!monto) return;
 
-  if (!monto) return;
+    const nuevoCliente = {
+      ...cliente,
+      saldo: cliente.saldo - monto,
+      historial: [
+        ...cliente.historial,
+        {
+          tipo: "pago",
+          concepto: "Pago",
+          valor: monto,
+          fecha: new Date().toLocaleDateString("es-CO", {
+            day: "2-digit", month: "short", year: "numeric",
+          }),
+        },
+      ],
+    };
 
-  const nuevoCliente = {
-    ...cliente,
-    saldo: cliente.saldo - monto,
-    historial: [
-      ...cliente.historial,
-      {
-        tipo: "pago",
-        concepto: "Pago",
-        valor: monto,
-        fecha: new Date().toLocaleDateString("es-CO", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-      },
-    ],
+    await actualizarCliente(nuevoCliente);
+    setValorPago(""); setModal(null);
   };
 
-  await actualizarCliente(nuevoCliente);
+  const enviarWhatsApp = (tipo) => {
+    if (!cliente?.telefono) return;
 
-  setValorPago("");
-  setModal(null);
-};
+    const historial = cliente.historial || [];
+    const items = tipo === "fiado"
+      ? historial.filter((h) => h.tipo === "fiado")
+      : historial;
 
-  const abrirModalFiado = () => { setProductoSel(null); setConcepto(""); setValorFiado(""); setModal("fiado"); };
+    if (items.length === 0) return;
+
+    const lineas = items.map((h) => {
+      const signo = h.tipo === "pago" ? "✅ Pago" : "📦 Fiado";
+      return `${signo} — ${h.concepto}: $${h.valor.toLocaleString("es-CO")} (${h.fecha})`;
+    });
+
+    const encabezado = tipo === "fiado"
+      ? `Hola ${cliente.nombre}, este es el resumen de lo que tienes fiado en nuestra tienda:`
+      : `Hola ${cliente.nombre}, este es tu historial completo en nuestra tienda:`;
+
+    const saldoLinea = `\n💰 *Saldo pendiente: $${cliente.saldo.toLocaleString("es-CO")}*`;
+
+    const mensaje = `${encabezado}\n\n${lineas.join("\n")}${saldoLinea}`;
+
+    const telefono = cliente.telefono.replace(/\D/g, "");
+    const url = `https://wa.me/57${telefono}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, "_blank");
+    setModalEnviar(false);
+  };
+
+  const abrirModalFiado = () => {
+    setProductoSel(null); setConcepto(""); setValorFiado(""); setModal("fiado");
+  };
 
   if (!cliente) return (
     <div className="page" style={{ textAlign: "center", paddingTop: 80 }}>
@@ -157,11 +170,16 @@ function ClienteDetalle() {
   const estaAlDia = cliente.saldo <= 0;
   const historialInverso = [...(cliente.historial || [])].reverse();
   const conceptoFinal = concepto.trim() || (productoSel ? productoSel.nombre : "");
+  const tieneTelefono = !!cliente.telefono;
+  const tieneMovimientos = cliente.historial?.length > 0;
+  const tieneFiados = cliente.historial?.some((h) => h.tipo === "fiado");
 
   return (
     <div className="page">
       <button className="back-btn" onClick={() => navigate("/")}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
         Volver
       </button>
 
@@ -172,6 +190,9 @@ function ClienteDetalle() {
         <div>
           <h1 style={{ fontFamily: "Fraunces, serif", fontSize: "1.5rem", color: "var(--cafe)" }}>{cliente.nombre}</h1>
           <p>{cliente.historial.length} movimiento{cliente.historial.length !== 1 ? "s" : ""}</p>
+          {cliente.telefono && (
+            <p style={{ fontSize: "0.8rem", color: "var(--texto-suave)", marginTop: 2 }}>📞 {cliente.telefono}</p>
+          )}
         </div>
       </div>
 
@@ -192,6 +213,19 @@ function ClienteDetalle() {
           <span className="icono-btn">✅</span>Registrar pago
         </button>
       </div>
+
+      {tieneTelefono && tieneMovimientos && (
+        <button
+          className="btn-whatsapp"
+          onClick={() => setModalEnviar(true)}
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L0 24l6.335-1.507A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.6a9.6 9.6 0 01-4.9-1.344l-.352-.208-3.656.87.937-3.555-.228-.365A9.6 9.6 0 1112 21.6z"/>
+          </svg>
+          Enviar resumen por WhatsApp
+        </button>
+      )}
 
       <div className="seccion-titulo">Historial</div>
 
@@ -216,6 +250,7 @@ function ClienteDetalle() {
         </div>
       )}
 
+      {/* Modal fiado */}
       {modal === "fiado" && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setModal(null)}>
           <div className="modal">
@@ -265,6 +300,7 @@ function ClienteDetalle() {
         </div>
       )}
 
+      {/* Modal pago */}
       {modal === "pago" && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setModal(null)}>
           <div className="modal">
@@ -281,6 +317,31 @@ function ClienteDetalle() {
               Confirmar pago
             </button>
             <button className="btn-cancelar" onClick={() => setModal(null)}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal elegir qué enviar */}
+      {modalEnviar && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setModalEnviar(false)}>
+          <div className="modal">
+            <div className="modal-handle" />
+            <h2>📲 Enviar resumen</h2>
+            <p style={{ color: "var(--texto-suave)", marginBottom: 16, fontSize: "0.9rem" }}>
+              ¿Qué quieres enviarle a <strong>{cliente.nombre}</strong>?
+            </p>
+
+            {tieneFiados && (
+              <button className="btn-confirmar-fiado" onClick={() => enviarWhatsApp("fiado")} style={{ marginBottom: 10 }}>
+                🧾 Solo lo que tiene fiado
+              </button>
+            )}
+
+            <button className="btn-confirmar-pago" onClick={() => enviarWhatsApp("todo")}>
+              📋 Todo el historial
+            </button>
+
+            <button className="btn-cancelar" onClick={() => setModalEnviar(false)}>Cancelar</button>
           </div>
         </div>
       )}

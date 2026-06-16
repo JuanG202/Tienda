@@ -5,24 +5,26 @@ import "../styles/NuevoCliente.css";
 
 function NuevoCliente() {
   const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
   const navigate = useNavigate();
 
   const guardarCliente = async () => {
-  if (!nombre.trim()) return;
+    if (!nombre.trim()) return;
 
-  try {
-    await axios.post(
-      "https://tienda-back-ten.vercel.app/api/clientes",
-      {
-        nombre: nombre.trim(),
-      }
-    );
+    try {
+      await axios.post(
+        "https://tienda-back-ten.vercel.app/api/clientes",
+        {
+          nombre: nombre.trim(),
+          telefono: telefono.trim(),
+        }
+      );
 
-    navigate("/");
-  } catch (error) {
-    console.error(error);
-  }
-};
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="page">
@@ -51,6 +53,17 @@ function NuevoCliente() {
             onChange={(e) => setNombre(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && guardarCliente()}
             autoFocus
+          />
+        </div>
+
+        <div className="campo">
+          <label>Numero de Teléfono <span className="opcional"></span></label>
+          <input
+            type="tel"
+            placeholder="Ej: 300 123 4567"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && guardarCliente()}
           />
         </div>
       </div>

@@ -188,3 +188,24 @@
 }
 .divider-o::before { left: 0; }
 .divider-o::after  { right: 0; }
+
+.btn-whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.btn-whatsapp:active {
+  opacity: 0.85;
+}
