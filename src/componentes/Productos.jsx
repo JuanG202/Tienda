@@ -35,7 +35,7 @@ function Productos() {
   const cargarProductos = async () => {
     try {
       const res = await axios.get(
-        "https://tienda-back-ten.vercel.app//api/productos"
+        "https://tienda-back-ten.vercel.app/api/productos"
       );
 
       setProductos(res.data);
@@ -69,7 +69,7 @@ function Productos() {
   try {
     if (editando) {
       await axios.put(
-        `https://tienda-back-ten.vercel.app//api/productos/${editando._id}`,
+        `https://tienda-back-ten.vercel.app/api/productos/${editando._id}`,
         {
           nombre: nombre.trim(),
           precio: monto,
@@ -78,7 +78,7 @@ function Productos() {
       );
     } else {
       await axios.post(
-        "https://tienda-back-ten.vercel.app//api/productos",
+        "https://tienda-back-ten.vercel.app/api/productos",
         {
           nombre: nombre.trim(),
           precio: monto,
@@ -88,7 +88,7 @@ function Productos() {
     }
 
     const res = await axios.get(
-      "https://tienda-back-ten.vercel.app//api/productos"
+      "https://tienda-back-ten.vercel.app/api/productos"
     );
 
     setProductos(res.data);
@@ -107,7 +107,7 @@ function Productos() {
   const eliminar = async (id) => {
   try {
     await axios.delete(
-      `https://tienda-back-ten.vercel.app//api/productos/${id}`
+      `https://tienda-back-ten.vercel.app/api/productos/${id}`
     );
 
     setProductos(

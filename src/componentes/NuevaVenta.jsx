@@ -44,11 +44,11 @@ useEffect(() => {
   const cargarDatos = async () => {
     try {
       const clientesRes = await axios.get(
-        "https://tienda-back-ten.vercel.app//api/clientes"
+        "https://tienda-back-ten.vercel.app/api/clientes"
       );
 
       const productosRes = await axios.get(
-        "https://tienda-back-ten.vercel.app//api/productos"
+        "https://tienda-back-ten.vercel.app/api/productos"
       );
 
       setClientes(clientesRes.data);
@@ -135,7 +135,7 @@ useEffect(() => {
     };
 
     await axios.put(
-      `https://tienda-back-ten.vercel.app//api/clientes/${clienteSeleccionado._id}`,
+      `https://tienda-back-ten.vercel.app/api/clientes/${clienteSeleccionado._id}`,
       clienteActualizado
     );
 

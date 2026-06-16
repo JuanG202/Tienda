@@ -42,11 +42,11 @@ function ClienteDetalle() {
   const cargarDatos = async () => {
     try {
       const resCliente = await axios.get(
-        `https://tienda-back-ten.vercel.app//api/clientes/${id}`
+        `https://tienda-back-ten.vercel.app/api/clientes/${id}`
       );
 
       const resProductos = await axios.get(
-        "https://tienda-back-ten.vercel.app//api/productos"
+        "https://tienda-back-ten.vercel.app/api/productos"
       );
 
       setCliente(resCliente.data);
@@ -63,7 +63,7 @@ function ClienteDetalle() {
   const actualizarCliente = async (nuevoCliente) => {
   try {
     const res = await axios.put(
-      `https://tienda-back-ten.vercel.app//api/clientes/${cliente._id}`,
+      `https://tienda-back-ten.vercel.app/api/clientes/${cliente._id}`,
       nuevoCliente
     );
 

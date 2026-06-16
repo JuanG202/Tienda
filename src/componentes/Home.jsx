@@ -48,7 +48,7 @@ useEffect(() => {
   const cargarClientes = async () => {
     try {
       const res = await axios.get(
-        "https://tienda-back-ten.vercel.app//api/clientes"
+        "https://tienda-back-ten.vercel.app/api/clientes"
       );
 
       setClientes(res.data);

@@ -12,7 +12,7 @@ function NuevoCliente() {
 
   try {
     await axios.post(
-      "https://tienda-back-ten.vercel.app//api/clientes",
+      "https://tienda-back-ten.vercel.app/api/clientes",
       {
         nombre: nombre.trim(),
       }
