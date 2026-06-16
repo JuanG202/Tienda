@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import { TabBar } from "./Home";
 import "../styles/Nuevaventa.css";
 
@@ -39,16 +40,37 @@ function NuevaVenta() {
   const [tipo, setTipo] = useState("fiado");
   const [confirmado, setConfirmado] = useState(false);
 
-  useEffect(() => {
-    const cs = JSON.parse(localStorage.getItem("clientes")) || [];
-    const ps = JSON.parse(localStorage.getItem("productos")) || [];
-    setClientes(cs);
-    setProductos(ps);
-    if (clienteId !== "seleccionar") {
-      const encontrado = cs.find((c) => c.id === Number(clienteId));
-      if (encontrado) { setClienteSeleccionado(encontrado); setPaso(2); }
+useEffect(() => {
+  const cargarDatos = async () => {
+    try {
+      const clientesRes = await axios.get(
+        "https://tienda-back-ten.vercel.app//api/clientes"
+      );
+
+      const productosRes = await axios.get(
+        "https://tienda-back-ten.vercel.app//api/productos"
+      );
+
+      setClientes(clientesRes.data);
+      setProductos(productosRes.data);
+
+      if (clienteId !== "seleccionar") {
+        const encontrado = clientesRes.data.find(
+          (c) => c._id === clienteId
+        );
+
+        if (encontrado) {
+          setClienteSeleccionado(encontrado);
+          setPaso(2);
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
-  }, [clienteId]);
+  };
+
+  cargarDatos();
+}, [clienteId]);
 
   const iniciales = (nombre) => {
     const p = nombre.trim().split(" ");
@@ -62,29 +84,67 @@ function NuevaVenta() {
     });
   };
 
-  const itemsSeleccionados = productos.filter((p) => (cantidades[p.id] || 0) > 0);
-  const total = itemsSeleccionados.reduce((acc, p) => acc + p.precio * (cantidades[p.id] || 0), 0);
+  const itemsSeleccionados = productos.filter((p) => (cantidades[p._id] || 0) > 0);
+  const total = itemsSeleccionados.reduce((acc, p) => acc + p.precio * (cantidades[p._id] || 0), 0);
 
-  const confirmarVenta = () => {
-    if (!clienteSeleccionado || total === 0) return;
-    const fecha = new Date().toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" });
-    const resumenItems = itemsSeleccionados.map((p) => `${p.nombre} x${cantidades[p.id]}`).join(", ");
-    const todosClientes = JSON.parse(localStorage.getItem("clientes")) || [];
-    const actualizados = todosClientes.map((c) => {
-      if (c.id !== clienteSeleccionado.id) return c;
-      return {
-        ...c,
-        saldo: tipo === "fiado" ? c.saldo + total : c.saldo,
-        historial: [...c.historial, {
-          tipo: tipo === "fiado" ? "fiado" : "venta",
-          concepto: resumenItems, valor: total, fecha,
-          items: itemsSeleccionados.map((p) => ({ nombre: p.nombre, cantidad: cantidades[p.id], precio: p.precio })),
-        }],
-      };
+  const confirmarVenta = async () => {
+  if (!clienteSeleccionado || total === 0) return;
+
+  try {
+    const fecha = new Date().toLocaleDateString("es-CO", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
-    localStorage.setItem("clientes", JSON.stringify(actualizados));
+
+    const resumenItems = itemsSeleccionados
+      .map(
+        (p) =>
+          `${p.nombre} x${cantidades[p._id]}`
+      )
+      .join(", ");
+
+    const clienteActualizado = {
+      ...clienteSeleccionado,
+      saldo:
+        tipo === "fiado"
+          ? clienteSeleccionado.saldo + total
+          : clienteSeleccionado.saldo,
+
+      historial: [
+        ...clienteSeleccionado.historial,
+        {
+          tipo:
+            tipo === "fiado"
+              ? "fiado"
+              : "venta",
+
+          concepto: resumenItems,
+
+          valor: total,
+
+          fecha,
+
+          items: itemsSeleccionados.map((p) => ({
+            nombre: p.nombre,
+            cantidad: cantidades[p._id],
+            precio: p.precio,
+          })),
+        },
+      ],
+    };
+
+    await axios.put(
+      `https://tienda-back-ten.vercel.app//api/clientes/${clienteSeleccionado._id}`,
+      clienteActualizado
+    );
+
     setConfirmado(true);
-  };
+
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   if (confirmado) {
     return (
@@ -122,7 +182,7 @@ function NuevaVenta() {
         ) : (
           <div className="clientes-lista">
             {clientes.map((cliente) => (
-              <button key={cliente.id} className="cliente-card" onClick={() => { setClienteSeleccionado(cliente); setPaso(2); }}>
+              <button key={cliente._id} className="cliente-card" onClick={() => { setClienteSeleccionado(cliente); setPaso(2); }}>
                 <div className="cliente-avatar">{iniciales(cliente.nombre)}</div>
                 <div className="cliente-info">
                   <div className="cliente-nombre">{cliente.nombre}</div>
@@ -167,9 +227,9 @@ function NuevaVenta() {
       ) : (
         <div className="productos-venta">
           {productos.map((p) => {
-            const cant = cantidades[p.id] || 0;
+            const cant = cantidades[p._id] || 0;
             return (
-              <div key={p.id} className="producto-venta-card">
+              <div key={p._id} className="producto-venta-card">
                 <div style={{ fontSize: "1.8rem", flexShrink: 0 }}>{p.emoji}</div>
                 <div className="producto-venta-info">
                   <div className="producto-venta-nombre">{p.nombre}</div>
@@ -179,9 +239,9 @@ function NuevaVenta() {
                   </div>
                 </div>
                 <div className="contador">
-                  <button className="contador-btn" onClick={() => cambiarCantidad(p.id, -1)} disabled={cant === 0}>−</button>
+                  <button className="contador-btn" onClick={() => cambiarCantidad(p._id, -1)} disabled={cant === 0}>−</button>
                   <span className="contador-num">{cant}</span>
-                  <button className="contador-btn" onClick={() => cambiarCantidad(p.id, 1)}>+</button>
+                  <button className="contador-btn" onClick={() => cambiarCantidad(p._id, 1)}>+</button>
                 </div>
               </div>
             );
@@ -195,7 +255,7 @@ function NuevaVenta() {
             <div className="titulo">Resumen</div>
             <div className="resumen-items">
               {itemsSeleccionados.map((p) => (
-                <div key={p.id}>{p.emoji} {p.nombre} ×{cantidades[p.id]} — ${(p.precio * cantidades[p.id]).toLocaleString("es-CO")}</div>
+                <div key={p._id}>{p.emoji} {p.nombre} ×{cantidades[p._id]} — ${(p.precio * cantidades[p._id]).toLocaleString("es-CO")}</div>
               ))}
             </div>
             <div className="resumen-total">${total.toLocaleString("es-CO")}</div>

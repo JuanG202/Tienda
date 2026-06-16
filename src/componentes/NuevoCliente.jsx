@@ -1,24 +1,28 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/NuevoCliente.css";
 
 function NuevoCliente() {
   const [nombre, setNombre] = useState("");
   const navigate = useNavigate();
 
-  const guardarCliente = () => {
-    if (!nombre.trim()) return;
-    const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-    const nuevoCliente = {
-      id: Date.now(),
-      nombre: nombre.trim(),
-      saldo: 0,
-      historial: [],
-    };
-    clientes.push(nuevoCliente);
-    localStorage.setItem("clientes", JSON.stringify(clientes));
+  const guardarCliente = async () => {
+  if (!nombre.trim()) return;
+
+  try {
+    await axios.post(
+      "https://tienda-back-ten.vercel.app//api/clientes",
+      {
+        nombre: nombre.trim(),
+      }
+    );
+
     navigate("/");
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
     <div className="page">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/Home.css";
 
 export function TabBar({ activo }) {
@@ -43,10 +44,21 @@ function Home() {
   const [clientes, setClientes] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("clientes")) || [];
-    setClientes(data);
-  }, []);
+useEffect(() => {
+  const cargarClientes = async () => {
+    try {
+      const res = await axios.get(
+        "https://tienda-back-ten.vercel.app//api/clientes"
+      );
+
+      setClientes(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  cargarClientes();
+}, []);
 
   const totalCartera = clientes.reduce((acc, cli) => acc + cli.saldo, 0);
   const clientesConDeuda = clientes.filter((c) => c.saldo > 0).length;
@@ -109,7 +121,7 @@ function Home() {
               <button
                 key={cliente.id}
                 className="cliente-card"
-                onClick={() => navigate(`/cliente/${cliente.id}`)}
+                onClick={() => navigate(`/cliente/${cliente._id}`)}
               >
                 <div className="cliente-avatar">
                   {iniciales(cliente.nombre).toUpperCase()}

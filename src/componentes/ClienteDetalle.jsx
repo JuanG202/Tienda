@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import axios from "axios";
 import "../styles/Clientedetalle.css";
 
 const fmt = (val) => {
@@ -37,21 +38,43 @@ function ClienteDetalle() {
   const [valorFiado, setValorFiado] = useState("");
   const [valorPago, setValorPago] = useState("");
 
-  useEffect(() => {
-    const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-    const encontrado = clientes.find((c) => c.id === Number(id));
-    setCliente(encontrado || null);
-    setProductos(JSON.parse(localStorage.getItem("productos")) || []);
-  }, [id]);
+ useEffect(() => {
+  const cargarDatos = async () => {
+    try {
+      const resCliente = await axios.get(
+        `https://tienda-back-ten.vercel.app//api/clientes/${id}`
+      );
 
-  const actualizarStorage = (nuevoCliente) => {
-    const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-    localStorage.setItem("clientes", JSON.stringify(clientes.map((c) => c.id === nuevoCliente.id ? nuevoCliente : c)));
-    setCliente(nuevoCliente);
+      const resProductos = await axios.get(
+        "https://tienda-back-ten.vercel.app//api/productos"
+      );
+
+      setCliente(resCliente.data);
+      setProductos(resProductos.data);
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
+  cargarDatos();
+}, [id]);
+
+  const actualizarCliente = async (nuevoCliente) => {
+  try {
+    const res = await axios.put(
+      `https://tienda-back-ten.vercel.app//api/clientes/${cliente._id}`,
+      nuevoCliente
+    );
+
+    setCliente(res.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
   const seleccionarProducto = (p) => {
-    if (productoSel && productoSel.id === p.id) {
+    if (productoSel && productoSel._id === p._id) {
       setProductoSel(null); setConcepto(""); setValorFiado("");
     } else {
       setProductoSel(p);
@@ -60,34 +83,68 @@ function ClienteDetalle() {
     }
   };
 
-  const registrarFiado = () => {
-    const conceptoFinal = concepto.trim() || (productoSel ? productoSel.nombre : "");
-    const monto = toNum(valorFiado);
-    if (!monto || !conceptoFinal) return;
-    actualizarStorage({
-      ...cliente,
-      saldo: cliente.saldo + monto,
-      historial: [...cliente.historial, {
-        tipo: "fiado", concepto: conceptoFinal, valor: monto,
-        fecha: new Date().toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" }),
-      }],
-    });
-    setConcepto(""); setValorFiado(""); setProductoSel(null); setModal(null);
+  const registrarFiado = async () => {
+  const conceptoFinal =
+    concepto.trim() || (productoSel ? productoSel.nombre : "");
+
+  const monto = toNum(valorFiado);
+
+  if (!monto || !conceptoFinal) return;
+
+  const nuevoCliente = {
+    ...cliente,
+    saldo: cliente.saldo + monto,
+    historial: [
+      ...cliente.historial,
+      {
+        tipo: "fiado",
+        concepto: conceptoFinal,
+        valor: monto,
+        fecha: new Date().toLocaleDateString("es-CO", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+      },
+    ],
   };
 
-  const registrarPago = () => {
-    const monto = toNum(valorPago);
-    if (!monto) return;
-    actualizarStorage({
-      ...cliente,
-      saldo: cliente.saldo - monto,
-      historial: [...cliente.historial, {
-        tipo: "pago", concepto: "Pago", valor: monto,
-        fecha: new Date().toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" }),
-      }],
-    });
-    setValorPago(""); setModal(null);
+  await actualizarCliente(nuevoCliente);
+
+  setConcepto("");
+  setValorFiado("");
+  setProductoSel(null);
+  setModal(null);
+};
+
+  const registrarPago = async () => {
+  const monto = toNum(valorPago);
+
+  if (!monto) return;
+
+  const nuevoCliente = {
+    ...cliente,
+    saldo: cliente.saldo - monto,
+    historial: [
+      ...cliente.historial,
+      {
+        tipo: "pago",
+        concepto: "Pago",
+        valor: monto,
+        fecha: new Date().toLocaleDateString("es-CO", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+      },
+    ],
   };
+
+  await actualizarCliente(nuevoCliente);
+
+  setValorPago("");
+  setModal(null);
+};
 
   const abrirModalFiado = () => { setProductoSel(null); setConcepto(""); setValorFiado(""); setModal("fiado"); };
 
@@ -170,13 +227,13 @@ function ClienteDetalle() {
                   <label>Selecciona un producto</label>
                   <div className="productos-selector">
                     {productos.map((p) => (
-                      <button key={p.id} className={`producto-opcion ${productoSel?.id === p.id ? "seleccionado" : ""}`} onClick={() => seleccionarProducto(p)}>
+                      <button key={p._id} className={`producto-opcion ${productoSel?._id === p._id ? "seleccionado" : ""}`} onClick={() => seleccionarProducto(p)}>
                         <span className="producto-opcion-emoji">{p.emoji}</span>
                         <div className="producto-opcion-info">
                           <div className="producto-opcion-nombre">{p.nombre}</div>
                           <div className="producto-opcion-precio">${p.precio.toLocaleString("es-CO")}</div>
                         </div>
-                        {productoSel?.id === p.id && (
+                        {productoSel?._id === p._id && (
                           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--cafe)" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
                         )}
                       </button>

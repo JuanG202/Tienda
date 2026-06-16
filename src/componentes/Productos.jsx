@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { TabBar } from "./Home";
+import axios from "axios";
 import "../styles/Productos.css";
 
 const toNum = (str) => Number(String(str).replace(/\./g, "")) || 0;
@@ -30,9 +31,21 @@ function Productos() {
   const [precio, setPrecio] = useState("");
   const [emoji, setEmoji] = useState("🍰");
 
-  useEffect(() => {
-    setProductos(JSON.parse(localStorage.getItem("productos")) || []);
-  }, []);
+ useEffect(() => {
+  const cargarProductos = async () => {
+    try {
+      const res = await axios.get(
+        "https://tienda-back-ten.vercel.app//api/productos"
+      );
+
+      setProductos(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  cargarProductos();
+}, []);
 
   const abrirNuevo = () => {
     setEditando(null);
@@ -48,30 +61,63 @@ function Productos() {
     setModal(true);
   };
 
-  const guardar = () => {
-    const monto = toNum(precio);
-    if (!nombre.trim() || !monto) return;
+  const guardar = async () => {
+  const monto = toNum(precio);
 
-    let actualizados;
+  if (!nombre.trim() || !monto) return;
+
+  try {
     if (editando) {
-      actualizados = productos.map((p) =>
-        p.id === editando.id ? { ...p, nombre: nombre.trim(), precio: monto, emoji } : p
+      await axios.put(
+        `https://tienda-back-ten.vercel.app//api/productos/${editando._id}`,
+        {
+          nombre: nombre.trim(),
+          precio: monto,
+          emoji,
+        }
       );
     } else {
-      actualizados = [...productos, { id: Date.now(), nombre: nombre.trim(), precio: monto, emoji }];
+      await axios.post(
+        "https://tienda-back-ten.vercel.app//api/productos",
+        {
+          nombre: nombre.trim(),
+          precio: monto,
+          emoji,
+        }
+      );
     }
 
-    setProductos(actualizados);
-    localStorage.setItem("productos", JSON.stringify(actualizados));
-    setNombre(""); setPrecio(""); setEmoji("🍰");
-    setEditando(null); setModal(false);
-  };
+    const res = await axios.get(
+      "https://tienda-back-ten.vercel.app//api/productos"
+    );
 
-  const eliminar = (id) => {
-    const actualizados = productos.filter((p) => p.id !== id);
-    setProductos(actualizados);
-    localStorage.setItem("productos", JSON.stringify(actualizados));
-  };
+    setProductos(res.data);
+
+    setNombre("");
+    setPrecio("");
+    setEmoji("🍰");
+    setEditando(null);
+    setModal(false);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+  const eliminar = async (id) => {
+  try {
+    await axios.delete(
+      `https://tienda-back-ten.vercel.app//api/productos/${id}`
+    );
+
+    setProductos(
+      productos.filter((p) => p._id !== id)
+    );
+
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
     <div className="page">
@@ -91,7 +137,7 @@ function Productos() {
       ) : (
         <div className="producto-lista">
           {productos.map((p) => (
-            <div key={p.id} className="producto-item">
+            <div key={p._id} className="producto-item">
               <div className="producto-emoji">{p.emoji}</div>
               <div className="producto-info">
                 <div className="producto-nombre">{p.nombre}</div>
@@ -104,7 +150,7 @@ function Productos() {
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                   </svg>
                 </button>
-                <button className="btn-eliminar" onClick={() => eliminar(p.id)} title="Eliminar">✕</button>
+                <button className="btn-eliminar" onClick={() => eliminar(p._id)} title="Eliminar">✕</button>
               </div>
             </div>
           ))}
