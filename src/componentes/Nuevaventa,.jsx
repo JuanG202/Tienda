@@ -31,7 +31,9 @@ function NuevaVenta() {
 
   const iniciales = (nombre) => {
     const p = nombre.trim().split(" ");
-    return (p.length >= 2 ? p[0][0] + p[1][0] : p[0].substring(0, 2)).toUpperCase();
+    return (
+      p.length >= 2 ? p[0][0] + p[1][0] : p[0].substring(0, 2)
+    ).toUpperCase();
   };
 
   const cambiarCantidad = (id, delta) => {
@@ -42,14 +44,21 @@ function NuevaVenta() {
     });
   };
 
-  const itemsSeleccionados = productos.filter((p) => (cantidades[p.id] || 0) > 0);
-  const total = itemsSeleccionados.reduce((acc, p) => acc + p.precio * (cantidades[p.id] || 0), 0);
+  const itemsSeleccionados = productos.filter(
+    (p) => (cantidades[p.id] || 0) > 0,
+  );
+  const total = itemsSeleccionados.reduce(
+    (acc, p) => acc + p.precio * (cantidades[p.id] || 0),
+    0,
+  );
 
   const confirmarVenta = () => {
     if (!clienteSeleccionado || total === 0) return;
 
     const fecha = new Date().toLocaleDateString("es-CO", {
-      day: "2-digit", month: "short", year: "numeric",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
 
     const resumenItems = itemsSeleccionados
@@ -86,27 +95,59 @@ function NuevaVenta() {
   // ── Pantalla de éxito ──
   if (confirmado) {
     return (
-      <div className="page" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", textAlign: "center" }}>
+      <div
+        className="page"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "70vh",
+          textAlign: "center",
+        }}
+      >
         <div style={{ fontSize: "4rem", marginBottom: 16 }}>✅</div>
-        <h2 style={{ fontFamily: "Fraunces, serif", fontSize: "1.6rem", color: "var(--verde)", marginBottom: 8 }}>
+        <h2
+          style={{
+            fontFamily: "Fraunces, serif",
+            fontSize: "1.6rem",
+            color: "var(--verde)",
+            marginBottom: 8,
+          }}
+        >
           {tipo === "fiado" ? "¡Fiado registrado!" : "¡Venta registrada!"}
         </h2>
         <p style={{ color: "var(--texto-suave)", marginBottom: 8 }}>
           <strong>{clienteSeleccionado.nombre}</strong>
         </p>
-        <p style={{ fontFamily: "Fraunces, serif", fontSize: "1.8rem", color: "var(--cafe)", marginBottom: 32 }}>
+        <p
+          style={{
+            fontFamily: "Fraunces, serif",
+            fontSize: "1.8rem",
+            color: "var(--cafe)",
+            marginBottom: 32,
+          }}
+        >
           ${total.toLocaleString("es-CO")}
         </p>
-        <button className="btn-verde" style={{ maxWidth: 280 }} onClick={() => navigate("/")}>
+        <button
+          className="btn-verde"
+          style={{ maxWidth: 280 }}
+          onClick={() => navigate("/")}
+        >
           Volver al inicio
         </button>
-        <button className="btn-primary" style={{ maxWidth: 280 }} onClick={() => {
-          setCantidades({});
-          setConfirmado(false);
-          setPaso(1);
-          setClienteSeleccionado(null);
-          navigate("/venta/seleccionar");
-        }}>
+        <button
+          className="btn-primary"
+          style={{ maxWidth: 280 }}
+          onClick={() => {
+            setCantidades({});
+            setConfirmado(false);
+            setPaso(1);
+            setClienteSeleccionado(null);
+            navigate("/venta/seleccionar");
+          }}
+        >
           Nueva venta
         </button>
       </div>
@@ -118,12 +159,21 @@ function NuevaVenta() {
     return (
       <div className="page">
         <button className="back-btn" onClick={() => navigate("/")}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
           Volver
         </button>
 
         <div className="header">
-          <div className="header-icon" style={{ background: "var(--cafe)" }}>🛒</div>
+          <div className="header-icon" style={{ background: "var(--cafe)" }}>
+            🛒
+          </div>
           <div>
             <h1 style={{ color: "var(--cafe)" }}>Nueva venta</h1>
             <p>¿A quién le vas a vender?</p>
@@ -133,7 +183,11 @@ function NuevaVenta() {
         {clientes.length === 0 ? (
           <div className="vacio">
             <div className="icono">👥</div>
-            <p>No hay clientes aún.<br />Agrega uno primero.</p>
+            <p>
+              No hay clientes aún.
+              <br />
+              Agrega uno primero.
+            </p>
           </div>
         ) : (
           <div className="clientes-lista">
@@ -146,14 +200,24 @@ function NuevaVenta() {
                   setPaso(2);
                 }}
               >
-                <div className="cliente-avatar">{iniciales(cliente.nombre)}</div>
+                <div className="cliente-avatar">
+                  {iniciales(cliente.nombre)}
+                </div>
                 <div className="cliente-info">
                   <div className="cliente-nombre">{cliente.nombre}</div>
                   <div className="cliente-fecha">
                     Saldo: ${cliente.saldo.toLocaleString("es-CO")}
                   </div>
                 </div>
-                <svg className="flecha" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="flecha"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
               </button>
@@ -169,18 +233,43 @@ function NuevaVenta() {
   // ── Paso 2: elegir productos ──
   return (
     <div className="page">
-      <button className="back-btn" onClick={() => { setPaso(1); setCantidades({}); navigate("/venta/seleccionar"); }}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
+      <button
+        className="back-btn"
+        onClick={() => {
+          setPaso(1);
+          setCantidades({});
+          navigate("/venta/seleccionar");
+        }}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <polyline points="15 18 9 12 15 6" />
+        </svg>
         Cambiar cliente
       </button>
 
       {clienteSeleccionado && (
         <div className="cliente-seleccionado-badge">
-          <svg className="badge-check" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          <svg
+            className="badge-check"
+            viewBox="0 0 24 24"
+            width="22"
+            height="22"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
           </svg>
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: "1rem" }}>{clienteSeleccionado.nombre}</div>
+            <div style={{ fontWeight: 700, fontSize: "1rem" }}>
+              {clienteSeleccionado.nombre}
+            </div>
             <div style={{ fontSize: "0.8rem", color: "var(--texto-suave)" }}>
               Saldo actual: ${clienteSeleccionado.saldo.toLocaleString("es-CO")}
             </div>
@@ -193,7 +282,11 @@ function NuevaVenta() {
       {productos.length === 0 ? (
         <div className="sin-productos">
           <p style={{ marginBottom: 12 }}>No tienes productos aún.</p>
-          <button className="btn-primary" style={{ maxWidth: 220, margin: "0 auto" }} onClick={() => navigate("/productos")}>
+          <button
+            className="btn-primary"
+            style={{ maxWidth: 220, margin: "0 auto" }}
+            onClick={() => navigate("/productos")}
+          >
             Ir a agregar productos
           </button>
         </div>
@@ -203,7 +296,9 @@ function NuevaVenta() {
             const cant = cantidades[p.id] || 0;
             return (
               <div key={p.id} className="producto-venta-card">
-                <div style={{ fontSize: "1.8rem", flexShrink: 0 }}>{p.emoji}</div>
+                <div style={{ fontSize: "1.8rem", flexShrink: 0 }}>
+                  {p.emoji}
+                </div>
                 <div className="producto-venta-info">
                   <div className="producto-venta-nombre">{p.nombre}</div>
                   <div className="producto-venta-precio">
@@ -216,9 +311,20 @@ function NuevaVenta() {
                   </div>
                 </div>
                 <div className="contador">
-                  <button className="contador-btn" onClick={() => cambiarCantidad(p.id, -1)} disabled={cant === 0}>−</button>
+                  <button
+                    className="contador-btn"
+                    onClick={() => cambiarCantidad(p.id, -1)}
+                    disabled={cant === 0}
+                  >
+                    −
+                  </button>
                   <span className="contador-num">{cant}</span>
-                  <button className="contador-btn" onClick={() => cambiarCantidad(p.id, 1)}>+</button>
+                  <button
+                    className="contador-btn"
+                    onClick={() => cambiarCantidad(p.id, 1)}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             );
@@ -233,19 +339,28 @@ function NuevaVenta() {
             <div className="resumen-items">
               {itemsSeleccionados.map((p) => (
                 <div key={p.id}>
-                  {p.emoji} {p.nombre} ×{cantidades[p.id]} — ${(p.precio * cantidades[p.id]).toLocaleString("es-CO")}
+                  {p.emoji} {p.nombre} ×{cantidades[p.id]} — $
+                  {(p.precio * cantidades[p.id]).toLocaleString("es-CO")}
                 </div>
               ))}
             </div>
-            <div className="resumen-total">${total.toLocaleString("es-CO")}</div>
+            <div className="resumen-total">
+              ${total.toLocaleString("es-CO")}
+            </div>
           </div>
 
           <div className="seccion-titulo">¿Cómo paga?</div>
           <div className="tipo-venta-tabs">
-            <button className={`tipo-tab ${tipo === "fiado" ? "activo fiado" : ""}`} onClick={() => setTipo("fiado")}>
+            <button
+              className={`tipo-tab ${tipo === "fiado" ? "activo fiado" : ""}`}
+              onClick={() => setTipo("fiado")}
+            >
               🧾 Fiar
             </button>
-            <button className={`tipo-tab ${tipo === "contado" ? "activo contado" : ""}`} onClick={() => setTipo("contado")}>
+            <button
+              className={`tipo-tab ${tipo === "contado" ? "activo contado" : ""}`}
+              onClick={() => setTipo("contado")}
+            >
               💵 Contado
             </button>
           </div>
@@ -255,6 +370,18 @@ function NuevaVenta() {
           </button>
         </>
       )}
+
+      <p className="created">
+        Created by:{" "}
+        <a
+          href="https://elmundodelatecnologiaf.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="created-link"
+        >
+          El Mundo de la tecnología
+        </a>
+      </p>
 
       <TabBar activo="venta" />
     </div>

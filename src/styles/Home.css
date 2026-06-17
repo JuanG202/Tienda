@@ -130,3 +130,35 @@
   opacity: 0.35;
   flex-shrink: 0;
 }
+
+.footer-credit {
+  margin: 25px 0 90px; /* deja espacio para la TabBar */
+  text-align: center;
+}
+
+.created {
+  color: #999;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.created-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.created-link:hover {
+  color: var(--verde);
+}
+
+@media (max-width: 768px) {
+  .footer-credit {
+    margin-bottom: 85px;
+  }
+
+  .created {
+    font-size: 0.75rem;
+  }
+}

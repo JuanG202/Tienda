@@ -22,7 +22,8 @@ export function TabBar({ activo }) {
         onClick={() => navigate("/venta/seleccionar")}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+          <circle cx="9" cy="21" r="1" />
+          <circle cx="20" cy="21" r="1" />
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
         </svg>
         Venta
@@ -44,21 +45,21 @@ function Home() {
   const [clientes, setClientes] = useState([]);
   const navigate = useNavigate();
 
-useEffect(() => {
-  const cargarClientes = async () => {
-    try {
-      const res = await axios.get(
-        "https://tienda-back-ten.vercel.app/api/clientes"
-      );
+  useEffect(() => {
+    const cargarClientes = async () => {
+      try {
+        const res = await axios.get(
+          "https://tienda-back-ten.vercel.app/api/clientes",
+        );
 
-      setClientes(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        setClientes(res.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  cargarClientes();
-}, []);
+    cargarClientes();
+  }, []);
 
   const totalCartera = clientes.reduce((acc, cli) => acc + cli.saldo, 0);
   const clientesConDeuda = clientes.filter((c) => c.saldo > 0).length;
@@ -97,7 +98,14 @@ useEffect(() => {
       </div>
 
       <button className="btn-primary" onClick={() => navigate("/nuevo")}>
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <svg
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+        >
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="16" />
           <line x1="8" y1="12" x2="16" y2="12" />
@@ -110,7 +118,11 @@ useEffect(() => {
       {clientes.length === 0 ? (
         <div className="vacio">
           <div className="icono">👥</div>
-          <p>Todavía no hay clientes.<br />Agrega el primero.</p>
+          <p>
+            Todavía no hay clientes.
+            <br />
+            Agrega el primero.
+          </p>
         </div>
       ) : (
         <div className="clientes-lista">
@@ -130,16 +142,39 @@ useEffect(() => {
                   <div className="cliente-nombre">{cliente.nombre}</div>
                   <div className="cliente-fecha">{ultimaFecha(cliente)}</div>
                 </div>
-                <div className={`cliente-saldo ${cliente.saldo <= 0 ? "pagado" : ""}`}>
+                <div
+                  className={`cliente-saldo ${cliente.saldo <= 0 ? "pagado" : ""}`}
+                >
                   ${cliente.saldo.toLocaleString("es-CO")}
                 </div>
-                <svg className="flecha" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="flecha"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
               </button>
             ))}
         </div>
       )}
+      <div className="footer-credit">
+        <p className="created">
+          Created by:{" "}
+          <a
+            href="https://elmundodelatecnologiaf.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="created-link"
+          >
+            El Mundo de la tecnología
+          </a>
+        </p>
+      </div>
 
       <TabBar activo="inicio" />
     </div>
