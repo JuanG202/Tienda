@@ -49,7 +49,14 @@ function Home() {
     const cargarClientes = async () => {
       try {
         const res = await axios.get(
-          "https://tienda-back-ten.vercel.app/api/clientes",
+          `https://tienda-back-ten.vercel.app/api/clientes?t=${Date.now()}`,
+          {
+            headers: {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
+          },
         );
 
         setClientes(res.data);
@@ -59,10 +66,27 @@ function Home() {
     };
 
     cargarClientes();
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        cargarClientes();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", cargarClientes);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", cargarClientes);
+    };
   }, []);
 
-  const totalCartera = clientes.reduce((acc, cli) => acc + cli.saldo, 0);
-  const clientesConDeuda = clientes.filter((c) => c.saldo > 0).length;
+  const totalCartera = clientes.reduce(
+    (acc, cli) => acc + (Number(cli.saldo) || 0),
+    0,
+  );
+  const clientesConDeuda = clientes.filter((c) => Number(c.saldo) > 0).length;
 
   const iniciales = (nombre) => {
     const partes = nombre.trim().split(" ");

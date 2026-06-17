@@ -43,10 +43,24 @@ function ClienteDetalle() {
     const cargarDatos = async () => {
       try {
         const resCliente = await axios.get(
-          `https://tienda-back-ten.vercel.app/api/clientes/${id}`
+          `https://tienda-back-ten.vercel.app/api/clientes/${id}?t=${Date.now()}`,
+          {
+            headers: {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
+          }
         );
         const resProductos = await axios.get(
-          "https://tienda-back-ten.vercel.app/api/productos"
+          `https://tienda-back-ten.vercel.app/api/productos?t=${Date.now()}`,
+          {
+            headers: {
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+              Expires: "0",
+            },
+          }
         );
         setCliente(resCliente.data);
         setProductos(resProductos.data);
